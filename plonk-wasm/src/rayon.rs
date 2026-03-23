@@ -25,7 +25,7 @@ where
     OP: FnOnce() -> R + Send,
     R: Send,
 {
-    let pool = unsafe { THREAD_POOL.as_ref().unwrap() };
+    let pool = unsafe { THREAD_POOL.as_ref().expect("thread pool not initialized") };
     pool.install(op)
 }
 
