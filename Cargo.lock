@@ -1757,7 +1757,7 @@ dependencies = [
 
 [[package]]
 name = "kimchi-napi"
-version = "0.5.0"
+version = "0.1.0"
 dependencies = [
  "ark-ec",
  "ark-ff",
@@ -1834,7 +1834,7 @@ dependencies = [
 
 [[package]]
 name = "kimchi_wasm"
-version = "0.4.1"
+version = "0.5.0"
 dependencies = [
  "ark-ec",
  "ark-ff",
@@ -1902,6 +1902,16 @@ dependencies = [
  "core2",
  "hashbrown 0.13.2",
  "rle-decode-fast",
+]
+
+[[package]]
+name = "libloading"
+version = "0.8.9"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d7c4b02199fee7c5d21a5ae7d8cfa79a6ef5bb2fc834d6e9058e89c825efdc55"
+dependencies = [
+ "cfg-if",
+ "windows-link",
 ]
 
 [[package]]

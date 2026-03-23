@@ -24,8 +24,8 @@ num-bigint.workspace = true
 num-integer.workspace = true
 rand.workspace = true
 rand_core.workspace = true
-rayon.workspace = true
-rmp-serde.workspace = true
+rayon = { workspace = true, optional = true }
+rmp-serde = { workspace = true, optional = true }
 rustversion.workspace = true
 serde.workspace = true
 serde_json = { workspace = true, optional = true }
