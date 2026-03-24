@@ -12,8 +12,7 @@ and this project adheres to
 - Upgrade to Rust 1.67.0
 - Remove unneeded ChaCha gates
 - Enforce deterministic ordering of gate lookup tables by replacing `HashSet`
-  with  
-  `BTreeSet`
+  with `BTreeSet`
 
 ## 0.1.0 (2023-02-06)
 
