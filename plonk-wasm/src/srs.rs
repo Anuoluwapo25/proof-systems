@@ -301,10 +301,10 @@ pub mod fp {
         domain_size: i32,
         input_bases: WasmVector<WasmPolyComm>,
     ) {
-        srs.lagrange_bases
-            .get_or_generate(domain_size as usize, || {
-                input_bases.into_iter().map(Into::into).collect()
-            });
+        srs.lagrange_bases.set(
+            domain_size as usize,
+            input_bases.into_iter().map(Into::into).collect(),
+        );
     }
 
     // compute & add lagrange basis internally, return the entire basis
@@ -381,10 +381,10 @@ pub mod fq {
         domain_size: i32,
         input_bases: WasmVector<WasmPolyComm>,
     ) {
-        srs.lagrange_bases
-            .get_or_generate(domain_size as usize, || {
-                input_bases.into_iter().map(Into::into).collect()
-            });
+        srs.lagrange_bases.set(
+            domain_size as usize,
+            input_bases.into_iter().map(Into::into).collect(),
+        );
     }
 
     // compute & add lagrange basis internally, return the entire basis

@@ -27,13 +27,27 @@ impl<Key: Hash + Eq, Value> HashMapCache<Key, Value> {
         }
     }
 
+    /// Sets a value by key only if it hasn't already been set
+    ///
+    /// # Panics
+    ///
+    /// Panics if the internal mutex is poisoned.
+    pub fn set(&self, key: Key, value: Value) {
+        let mut hashmap = self.contents.lock().unwrap();
+        let _ = hashmap.entry(key).or_insert(value);
+    }
+
     /// Retrieves a cached value by key, or generates and caches it using the
     /// provided closure.
     ///
     /// # Panics
     ///
     /// Panics if the internal mutex is poisoned.
-    pub fn get_or_generate<F: FnOnce() -> Value>(&self, key: Key, generator: F) -> &Value {
+    pub(crate) fn get_or_generate<'a, F: FnOnce() -> Value>(
+        &'a self,
+        key: Key,
+        generator: F,
+    ) -> &'a Value {
         let mut hashmap = self.contents.lock().unwrap();
         let entry = (*hashmap).entry(key);
         let inner_ptr = match entry {
