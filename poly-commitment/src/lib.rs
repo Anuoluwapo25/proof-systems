@@ -9,6 +9,8 @@
 
 extern crate alloc;
 
+use std::ops::Deref;
+
 use alloc::vec::Vec;
 
 mod combine;
@@ -202,10 +204,16 @@ pub trait SRS<G: CommitmentCurve>: Clone + Sized + Sync + Send {
 
     /// Compute commitments to the lagrange basis corresponding to the given domain and
     /// cache them in the SRS
-    fn get_lagrange_basis(&self, domain: D<G::ScalarField>) -> &Vec<PolyComm<G>>;
+    fn get_lagrange_basis(
+        &self,
+        domain: D<G::ScalarField>,
+    ) -> impl Deref<Target = Vec<PolyComm<G>>> + '_;
 
     /// Same as `get_lagrange_basis` but only using the domain size.
-    fn get_lagrange_basis_from_domain_size(&self, domain_size: usize) -> &Vec<PolyComm<G>>;
+    fn get_lagrange_basis_from_domain_size(
+        &self,
+        domain_size: usize,
+    ) -> impl Deref<Target = Vec<PolyComm<G>>> + '_;
 
     fn size(&self) -> usize;
 }

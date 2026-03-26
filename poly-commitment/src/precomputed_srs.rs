@@ -16,7 +16,7 @@ use ark_serialize::{CanonicalDeserialize, CanonicalSerialize};
 use mina_curves::named::NamedCurve;
 use serde::{Deserialize, Serialize};
 use serde_with::serde_as;
-use std::{collections::HashMap, fs::File, io::BufReader, path::PathBuf};
+use std::{collections::HashMap, fs::File, io::BufReader, path::PathBuf, sync::Arc};
 
 /// We store several different types of SRS objects. This enum parameterizes
 /// them.
@@ -46,8 +46,8 @@ pub struct TestSRS<G> {
     pub h: G,
 
     /// Commitments to Lagrange bases, per domain size
-    #[serde_as(as = "HashMap<_,Vec<PolyComm<o1_utils::serialization::SerdeAsUnchecked>>>")]
-    pub lagrange_bases: HashMap<usize, Vec<PolyComm<G>>>,
+    #[serde_as(as = "HashMap<_,Arc<Vec<PolyComm<o1_utils::serialization::SerdeAsUnchecked>>>>")]
+    pub lagrange_bases: HashMap<usize, Arc<Vec<PolyComm<G>>>>,
 }
 
 impl<G: Clone> From<SRS<G>> for TestSRS<G> {

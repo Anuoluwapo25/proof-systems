@@ -43,7 +43,7 @@ fn add_lagrange_basis_with_cache<G: CommitmentCurve, C: LagrangeCache<G>>(
     if let Some(basis) = cache.load_lagrange_basis_from_cache(srs.g.len(), &domain) {
         srs.lagrange_bases.get_or_generate(n, || basis);
     } else {
-        let basis = srs.get_lagrange_basis(domain);
+        let basis = &*srs.get_lagrange_basis(domain);
         cache.cache_lagrange_basis(srs.g.len(), &domain, basis);
     }
 }

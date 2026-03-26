@@ -37,6 +37,8 @@ use rand_core::{CryptoRng, RngCore};
 use rayon::prelude::*;
 use serde::{Deserialize, Serialize};
 use serde_with::serde_as;
+#[cfg(feature = "std")]
+use std::ops::Deref;
 use zeroize::Zeroize;
 
 #[serde_as]
@@ -604,7 +606,7 @@ where
         domain: D<G::ScalarField>,
         plnm: &Evaluations<G::ScalarField, D<G::ScalarField>>,
     ) -> PolyComm<G> {
-        let basis = self.get_lagrange_basis(domain);
+        let basis = &*self.get_lagrange_basis(domain);
         let commit_evaluations = |evals: &Vec<G::ScalarField>, basis: &Vec<PolyComm<G>>| {
             let basis_refs: Vec<_> = basis.iter().collect();
             PolyComm::<G>::multi_scalar_mul(&basis_refs, evals)
@@ -670,15 +672,21 @@ where
         }
     }
 
-    fn get_lagrange_basis_from_domain_size(&self, domain_size: usize) -> &Vec<PolyComm<G>> {
-        self.lagrange_bases.get_or_generate(domain_size, || {
+    fn get_lagrange_basis_from_domain_size(
+        &self,
+        domain_size: usize,
+    ) -> impl Deref<Target = Vec<PolyComm<G>>> + '_ {
+        self.lagrange_bases.get_or_generate(domain_size, move || {
             self.lagrange_basis(D::new(domain_size).unwrap())
         })
     }
 
-    fn get_lagrange_basis(&self, domain: D<G::ScalarField>) -> &Vec<PolyComm<G>> {
+    fn get_lagrange_basis(
+        &self,
+        domain: D<G::ScalarField>,
+    ) -> impl Deref<Target = Vec<PolyComm<G>>> + '_ {
         self.lagrange_bases
-            .get_or_generate(domain.size(), || self.lagrange_basis(domain))
+            .get_or_generate(domain.size(), move || self.lagrange_basis(domain))
     }
 
     fn size(&self) -> usize {
