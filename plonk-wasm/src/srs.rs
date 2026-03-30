@@ -301,7 +301,7 @@ pub mod fp {
         domain_size: i32,
         input_bases: WasmVector<WasmPolyComm>,
     ) {
-        srs.lagrange_bases.set(
+        srs.lagrange_bases.set_once(
             domain_size as usize,
             input_bases.into_iter().map(Into::into).collect(),
         );
@@ -381,7 +381,7 @@ pub mod fq {
         domain_size: i32,
         input_bases: WasmVector<WasmPolyComm>,
     ) {
-        srs.lagrange_bases.set(
+        srs.lagrange_bases.set_once(
             domain_size as usize,
             input_bases.into_iter().map(Into::into).collect(),
         );

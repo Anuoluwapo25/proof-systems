@@ -31,7 +31,7 @@ impl<Key: Hash + Eq, Value> HashMapCache<Key, Value> {
     /// # Panics
     ///
     /// Panics if the internal mutex is poisoned.
-    pub fn set(&self, key: Key, value: Value) {
+    pub fn set_once(&self, key: Key, value: Value) {
         let mut hashmap = self.contents.lock().unwrap();
         let _ = hashmap.entry(key).or_insert_with(|| Arc::new(value));
     }
@@ -42,7 +42,7 @@ impl<Key: Hash + Eq, Value> HashMapCache<Key, Value> {
     /// # Panics
     ///
     /// Panics if the internal mutex is poisoned.
-    #[allow(clippy::significant_drop_tightening)] // it's a flase positive, you can't drop the lock any earlier
+    #[allow(clippy::significant_drop_tightening)] // it's a false positive, you can't drop the lock any earlier
     pub(crate) fn get_or_generate<F: FnOnce() -> Value>(
         &self,
         key: Key,
