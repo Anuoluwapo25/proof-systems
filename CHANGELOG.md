@@ -31,10 +31,44 @@ and this project adheres to
 - Add `test-kimchi-verifier-only` Makefile target and CI step for running kimchi
   tests without the prover feature.
 
-### Changed
+#### Changed
+
+- Make all workspace dependencies `no_std`-compatible by setting
+  `default-features = false` at the workspace level and opting into features
+  per-crate. Crates on the `no_std` path propagate `std`/`parallel` features
+  through their own feature flags.
+- Replace `once_cell::sync::Lazy` with `o1_utils::lazy_lock::LazyLock`, making
+  `KimchiCurve` trait impls available without `std`.
+- Use integer APIs instead of floating-point conversion in `not` and `xor`
+  circuit polynomials.
 
 - Enforce deterministic ordering of gate lookup tables by replacing `HashSet`
   with `BTreeSet` ([#3539](https://github.com/o1-labs/proof-systems/pull/3539))
+
+### [o1-utils](./utils)
+
+#### Added
+
+- Add `lazy_lock::LazyLock`, a `no_std`-compatible drop-in for
+  `std::sync::LazyLock`. Delegates to `std` when available; falls back to
+  `spin::Lazy` in `no_std` environments.
+
+### [poly-commitment](./poly-commitment)
+
+#### Changed
+
+- Gate prover-only `SRS` trait methods behind `#[cfg(feature = "std")]` so the
+  core trait and IPA implementation compile in `no_std`.
+- Add a thread-safe no-std lagrange basis cache using a spinlock and `Arc`,
+  replacing the previous `Rc<RefCell<HashMap>>` approach that required
+  `unsafe impl Send/Sync` on `SRS`.
+
+### [mina-poseidon](./poseidon)
+
+#### Changed
+
+- Replace `std::sync::LazyLock` with `o1_utils::lazy_lock::LazyLock` in pasta
+  sponge parameter modules, making `static_params()` available in `no_std`.
 
 ### Fixed
 
