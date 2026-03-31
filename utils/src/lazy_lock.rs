@@ -56,16 +56,39 @@ impl<T, F: FnOnce() -> T> Deref for LazyLock<T, F> {
 /// See the [module-level documentation](self) for the synchronization protocol.
 #[cfg(not(feature = "std"))]
 pub struct LazyLock<T, F = fn() -> T> {
-    initialized: core::sync::atomic::AtomicBool,
-    initializing: core::sync::atomic::AtomicBool,
+    state: core::sync::atomic::AtomicU8,
     data: core::cell::UnsafeCell<core::mem::MaybeUninit<T>>,
     init: core::cell::UnsafeCell<Option<F>>,
 }
 
-// SAFETY: Access to `data` and `init` is synchronized through the two atomic
-// bools. Only the thread that wins the `initializing` compare-exchange writes
-// to `data` and `init`. All other threads spin until `initialized` is set,
-// after which `data` is read-only.
+#[cfg(not(feature = "std"))]
+#[repr(u8)]
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum State {
+    Uninitialized = 0,
+    Initializing = 1,
+    Initialized = 2,
+    Poisoned = 3,
+}
+
+#[cfg(not(feature = "std"))]
+impl State {
+    #[inline]
+    fn from_u8(value: u8) -> Self {
+        match value {
+            0 => State::Uninitialized,
+            1 => State::Initializing,
+            2 => State::Initialized,
+            3 => State::Poisoned,
+            _ => unreachable!("Invalid LazyLock state"),
+        }
+    }
+}
+
+// SAFETY: Access to `data` and `init` is synchronized through the `state` atomic.
+// Only the thread that transitions the state from `Uninitialized` to `Initializing`
+// writes to `data` and `init`. All other threads spin until the state becomes
+// `Initialized`, after which `data` is read-only.
 #[cfg(not(feature = "std"))]
 #[allow(unsafe_code)]
 unsafe impl<T: Send + Sync, F: Send> Sync for LazyLock<T, F> {}
@@ -77,8 +100,7 @@ unsafe impl<T: Send, F: Send> Send for LazyLock<T, F> {}
 impl<T, F: FnOnce() -> T> LazyLock<T, F> {
     pub const fn new(init: F) -> Self {
         Self {
-            initialized: core::sync::atomic::AtomicBool::new(false),
-            initializing: core::sync::atomic::AtomicBool::new(false),
+            state: core::sync::atomic::AtomicU8::new(State::Uninitialized as u8),
             data: core::cell::UnsafeCell::new(core::mem::MaybeUninit::uninit()),
             init: core::cell::UnsafeCell::new(Some(init)),
         }
@@ -88,37 +110,86 @@ impl<T, F: FnOnce() -> T> LazyLock<T, F> {
     fn force(&self) -> &T {
         use core::sync::atomic::Ordering;
 
-        if self.initialized.load(Ordering::Acquire) {
-            // SAFETY: `initialized` is only set after `data` has been fully
+        // Fast path: Check if already initialized.
+        if self.state.load(Ordering::Acquire) == State::Initialized as u8 {
+            // SAFETY: `state` is Initialized, meaning `data` has been fully
             // written, and `Acquire` ordering synchronizes with the `Release`
             // store in the initializing thread.
             return unsafe { (*self.data.get()).assume_init_ref() };
         }
 
-        if self
-            .initializing
-            .compare_exchange(false, true, Ordering::AcqRel, Ordering::Acquire)
-            .is_ok()
-        {
-            // We won the race — initialize the value.
-            // SAFETY: We are the only thread past the compare-exchange, so we
-            // have exclusive access to `data` and `init`.
-            unsafe {
-                let init = (*self.init.get()).take().unwrap();
-                (*self.data.get()).write(init());
-            }
-            self.initialized.store(true, Ordering::Release);
-        } else {
-            // Another thread is initializing — spin until done.
-            while !self.initialized.load(Ordering::Acquire) {
-                core::hint::spin_loop();
+        // Slow path: Spin-lock and initialization
+        loop {
+            match self.state.compare_exchange_weak(
+                State::Uninitialized as u8,
+                State::Initializing as u8,
+                Ordering::AcqRel,
+                Ordering::Acquire,
+            ) {
+                Ok(_) => {
+                    // We won the race — initialize the value.
+                    // Guard to catch panics in the init closure and poison the lock.
+                    struct PanicGuard<'a>(&'a core::sync::atomic::AtomicU8);
+                    impl Drop for PanicGuard<'_> {
+                        fn drop(&mut self) {
+                            self.0.store(State::Poisoned as u8, Ordering::Release);
+                        }
+                    }
+                    let guard = PanicGuard(&self.state);
+
+                    // SAFETY: We are the only thread past the compare-exchange into Initializing,
+                    // so we have exclusive access to `data` and `init`.
+                    unsafe {
+                        let init_fn = (*self.init.get())
+                            .take()
+                            .expect("LazyLock init function missing");
+                        (*self.data.get()).write(init_fn());
+                    }
+
+                    // Success: Update state and prevent the guard from poisoning the lock.
+                    self.state
+                        .store(State::Initialized as u8, Ordering::Release);
+                    core::mem::forget(guard); // Disarm the panic guard
+
+                    // SAFETY: We just fully initialized the data.
+                    return unsafe { (*self.data.get()).assume_init_ref() };
+                }
+                Err(current_state_u8) => match State::from_u8(current_state_u8) {
+                    State::Initialized => {
+                        // Another thread finished initializing while we were spinning.
+                        // SAFETY: `state` is Initialized, `Acquire` ordering guarantees visibility.
+                        return unsafe { (*self.data.get()).assume_init_ref() };
+                    }
+                    State::Initializing => {
+                        // Another thread is actively initializing — spin until done.
+                        core::hint::spin_loop();
+                    }
+                    State::Poisoned => {
+                        // The initializing thread panicked.
+                        core::panic!("LazyLock instance has previously been poisoned");
+                    }
+                    State::Uninitialized => {
+                        // Spurious failure from `compare_exchange_weak`, loop immediately.
+                        continue;
+                    }
+                },
             }
         }
+    }
+}
 
-        // SAFETY: `initialized` is true, so `data` is fully written.
-        #[allow(unsafe_code)]
-        unsafe {
-            (*self.data.get()).assume_init_ref()
+#[cfg(not(feature = "std"))]
+impl<T, F> core::ops::Drop for LazyLock<T, F> {
+    fn drop(&mut self) {
+        // We have an exclusive reference (`&mut self`), so no other thread can be
+        // accessing this lock. We can safely bypass atomic loads and use `get_mut()`.
+        if *self.state.get_mut() == State::Initialized as u8 {
+            // SAFETY: If the state is Initialized, `data` contains a valid, fully
+            // initialized `T`. We must drop it to prevent memory leaks.
+            #[allow(unsafe_code)]
+            unsafe {
+                (*self.data.get()).assume_init_drop();
+            }
         }
     }
 }
@@ -129,5 +200,62 @@ impl<T, F: FnOnce() -> T> Deref for LazyLock<T, F> {
 
     fn deref(&self) -> &T {
         self.force()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::LazyLock;
+    extern crate std;
+
+    #[test]
+    fn lazy_lock_panic() {
+        static VALUE: LazyLock<u64> = LazyLock::new(|| {
+            panic!("test_lazy_lock_panic");
+        });
+
+        std::thread::scope(|s| {
+            let error_counts = (0..4)
+                .map(|_| {
+                    s.spawn(|| {
+                        assert_eq!(*VALUE, 3);
+                    })
+                })
+                .map(|thread| thread.join().unwrap_err())
+                .map(|err| *err.downcast_ref::<&'static str>().unwrap())
+                .fold(std::collections::HashMap::new(), |mut acc, err| {
+                    *acc.entry(err).or_insert(0) += 1;
+                    acc
+                });
+
+            assert_eq!(error_counts.get("test_lazy_lock_panic").copied(), Some(1));
+            assert_eq!(
+                error_counts
+                    .get("LazyLock instance has previously been poisoned")
+                    .copied(),
+                Some(3)
+            );
+        });
+    }
+
+    #[test]
+    fn lazy_lock_success() {
+        static VALUE: LazyLock<u64> = LazyLock::new(|| 3);
+
+        std::thread::scope(|s| {
+            let threads = (0..4)
+                .map(|_| {
+                    s.spawn(|| {
+                        assert_eq!(*VALUE, 3);
+                    })
+                })
+                .collect::<alloc::vec::Vec<_>>();
+
+            for thread in threads {
+                thread.join().unwrap();
+            }
+
+            assert_eq!(*VALUE, 3);
+        });
     }
 }
