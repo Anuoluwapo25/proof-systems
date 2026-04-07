@@ -9,6 +9,8 @@ and this project adheres to
 
 ## Unreleased
 
+## 0.6.0
+
 ### [kimchi](./kimchi)
 
 #### Added
@@ -44,6 +46,9 @@ and this project adheres to
 
 - Enforce deterministic ordering of gate lookup tables by replacing `HashSet`
   with `BTreeSet` ([#3539](https://github.com/o1-labs/proof-systems/pull/3539))
+- Update wasm-bindgen to 0.2.100 and js-sys to 0.3.77 to restore compatibility
+  with Rust nightly 2025-12-11 after the toolchain upgrade from 2024-09-05
+  ([#3544](https://github.com/o1-labs/proof-systems/pull/3544))
 - Bumped `wasm-bindgen` dependency from `0.2.100` to `0.2.106` for better
   interoperability with `mina-rust`
   ([#3558](https://github.com/o1-labs/proof-systems/pull/3558))
