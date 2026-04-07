@@ -44,6 +44,9 @@ and this project adheres to
 
 - Enforce deterministic ordering of gate lookup tables by replacing `HashSet`
   with `BTreeSet` ([#3539](https://github.com/o1-labs/proof-systems/pull/3539))
+- Bumped `wasm-bindgen` dependency from `0.2.100` to `0.2.106` for better
+  interoperability with `mina-rust`
+  ([#3558](https://github.com/o1-labs/proof-systems/pull/3558))
 
 ### [o1-utils](./utils)
 
