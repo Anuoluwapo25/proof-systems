@@ -378,7 +378,7 @@ macro_rules! impl_verification_key {
                             rot_comm: (&evals.rot_comm).as_ref().map(Into::into),
 
                             w: {
-                                let res = once_cell::sync::OnceCell::new();
+                                let res = std::sync::OnceLock::new();
                                 res.set(zk_w(domain, zk_rows)).unwrap();
                                 res
                             },
@@ -387,7 +387,7 @@ macro_rules! impl_verification_key {
                             public: public_ as usize,
                             prev_challenges: prev_challenges as usize,
                             permutation_vanishing_polynomial_m: {
-                                let res = once_cell::sync::OnceCell::new();
+                                let res = std::sync::OnceLock::new();
                                 res.set(permutation_vanishing_polynomial(domain, zk_rows))
                                     .unwrap();
                                 res

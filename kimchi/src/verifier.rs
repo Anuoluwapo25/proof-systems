@@ -3,8 +3,6 @@ use alloc::{vec, vec::Vec};
 
 use core::fmt::Debug;
 
-use std::fmt::Debug;
-
 use crate::{
     circuits::{
         argument::ArgumentType,

@@ -4,9 +4,7 @@ use core::ops::Deref;
 use napi::bindgen_prelude::{sys, ClassInstance, Error, FromNapiValue, Result, Status, Uint8Array};
 use napi_derive::napi;
 use paste::paste;
-use poly_commitment::{
-    commitment::b_poly_coefficients, hash_map_cache::HashMapCache, ipa::SRS, SRS as ISRS,
-};
+use poly_commitment::{commitment::b_poly_coefficients, ipa::SRS, SRS as ISRS};
 use serde::{Deserialize, Serialize};
 use std::{
     fs::{File, OpenOptions},
@@ -204,7 +202,7 @@ macro_rules! impl_srs {
 
                   let h = h_and_gs.remove(0);
                   let g = h_and_gs;
-                  let srs = SRS::<$G> { h, g, lagrange_bases: HashMapCache::new() };
+                  let srs = SRS::<$G>::new(g, h);
                   Arc::new(srs).into()
               }
 
@@ -216,7 +214,7 @@ macro_rules! impl_srs {
               ) -> Option<$NapiPolyComm> {
                   if !srs
                       .0
-                      .lagrange_bases
+                      .lagrange_bases()
                       .contains_key(&(domain_size as usize))
                   {
                       return None;
@@ -231,8 +229,8 @@ macro_rules! impl_srs {
                   domain_size: i32,
                   input_bases: NapiVector<$NapiPolyComm>,
               ) {
-                  srs.0.lagrange_bases
-                      .get_or_generate(domain_size as usize, || { input_bases.into_iter().map(Into::into).collect()});
+                  srs.0.lagrange_bases()
+                      .set_once(domain_size as usize, input_bases.into_iter().map(Into::into).collect());
               }
 
               #[napi(js_name = [<"caml_" $name:snake "_srs_get_lagrange_basis">])]

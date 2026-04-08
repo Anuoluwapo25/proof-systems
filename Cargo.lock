@@ -882,6 +882,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "ctor"
+version = "0.6.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "424e0138278faeb2b401f174ad17e715c829512d74f3d1e81eb43365c2e0590e"
+dependencies = [
+ "ctor-proc-macro",
+ "dtor",
+]
+
+[[package]]
+name = "ctor-proc-macro"
+version = "0.0.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "52560adf09603e58c9a7ee1fe1dcb95a16927b17c127f0ac02d6e768a0e25bc1"
+
+[[package]]
 name = "cty"
 version = "0.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1831,7 +1847,7 @@ dependencies = [
 
 [[package]]
 name = "kimchi_wasm"
-version = "0.5.0"
+version = "0.6.0"
 dependencies = [
  "ark-ec",
  "ark-ff",
@@ -1849,7 +1865,6 @@ dependencies = [
  "mina-poseidon",
  "num-bigint",
  "o1-utils",
- "once_cell",
  "paste",
  "poly-commitment",
  "rand 0.8.5",
@@ -1899,6 +1914,16 @@ dependencies = [
  "core2",
  "hashbrown 0.13.2",
  "rle-decode-fast",
+]
+
+[[package]]
+name = "libloading"
+version = "0.8.9"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d7c4b02199fee7c5d21a5ae7d8cfa79a6ef5bb2fc834d6e9058e89c825efdc55"
+dependencies = [
+ "cfg-if",
+ "windows-link",
 ]
 
 [[package]]

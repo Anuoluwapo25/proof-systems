@@ -42,6 +42,8 @@ ark-poly = { version = "0.5", default-features = false }
 ark-serialize = { version = "0.5", default-features = false }
 ark-std = { version = "0.5", default-features = false }
 ark-test-curves = { version = "0.5", features = ["parallel", "asm"] }
+arkworks = { path = "crates/arkworks" }
+arrabbiata = { path = "./arrabbiata" }
 base64 = "0.21.5"
 bcs = { version = "0.1.3", default-features = false }
 bitvec = "1.0.0"
@@ -57,19 +59,36 @@ criterion = { version = "0.5", features = [
 elf = "0.7.2"
 env_logger = "0.11.6"
 getrandom = { version = "0.2.15", features = ["js"] }
+groupmap = { path = "./groupmap", default-features = false }
 hashbrown = { version = "0.15", features = ["serde"] }
 hex = { version = "0.4", default-features = false, features = [
   "alloc",
   "serde",
 ] }
 iai = "0.1"
+internal-tracing = { path = "./internal-tracing", default-features = false }
 itertools = { version = "0.12.1", default-features = false, features = [
   "use_alloc",
 ] }
 js-sys = "=0.3.83"
+kimchi = { path = "./kimchi", features = ["bn254"] }
+kimchi-msm = { path = "./msm" }
+kimchi-stubs = { path = "./kimchi-stubs" }
+kimchi-visu = { path = "./tools/kimchi-visu" }
+kimchi_napi = { path = "./kimchi-napi" }
+kimchi_wasm = { path = "./kimchi-wasm" }
 libc = "=0.2.169"
 libflate = "2"
 log = "0.4.20"
+mina-base58 = { path = "./crates/mina-base58" }
+mina-curves = { path = "./curves", default-features = false, features = [
+  "asm",
+] }
+mina-hasher = { path = "./hasher" }
+mina-poseidon = { path = "./poseidon", default-features = false }
+mina-signer = { path = "./signer" }
+mina-tx-type = { path = "./mina-tx-type" }
+mvpoly = { path = "./mvpoly" }
 napi = { git = "https://github.com/o1-labs/napi-rs.git", rev = "023d1d4f31bd75e8ab55c95b5077a319b5208cdf", version = "3.3.0", default-features = false, features = [
   "napi7",
 ] }
@@ -82,10 +101,15 @@ num-bigint = { version = "0.4.6", default-features = false, features = [
   "serde",
 ] }
 num-integer = { version = "0.1.45", default-features = false }
+o1-utils = { path = "./utils", default-features = false }
+o1vm = { path = "./o1vm" }
 ocaml = { version = "0.22.2" }
 ocaml-gen = { version = "1.0.0" }
+once_cell = "=1.21.3"
+optimism = { path = "./optimism" }
 os_pipe = { version = "1.1.4", features = ["io_safety"] }
 paste = "1.0.15"
+poly-commitment = { path = "./poly-commitment", default-features = false }
 proptest = "1.0.0"
 proptest-derive = "0.6.0"
 rand = { version = "0.8.5", default-features = false }
@@ -109,6 +133,7 @@ serde_with = { version = "3.12", default-features = false, features = [
 ] }
 sha2 = { version = "0.10.0", default-features = false }
 sha3 = "0.10.8"
+signer = { path = "./signer" }
 spmc = "=0.3.0"
 strum = { version = "0.27.2", default-features = false }
 strum_macros = "0.26.1"
@@ -117,36 +142,11 @@ thiserror = { version = "2", default-features = false }
 tikv-jemalloc-ctl = { version = "0.5" }
 tikv-jemallocator = { version = "0.5" }
 tinytemplate = "1.1"
+utils = { path = "./utils" }
 wasm-bindgen = "=0.2.106"
 wasm-bindgen-test = ">=0.3.0"
-zeroize = "1"
-
-arkworks = { path = "crates/arkworks" }
-arrabbiata = { path = "./arrabbiata" }
-groupmap = { path = "./groupmap", default-features = false }
-internal-tracing = { path = "./internal-tracing", default-features = false }
-kimchi = { path = "./kimchi", features = ["bn254"] }
-kimchi-msm = { path = "./msm" }
-kimchi-stubs = { path = "./kimchi-stubs" }
-kimchi-visu = { path = "./tools/kimchi-visu" }
-kimchi_napi = { path = "./kimchi-napi" }
-kimchi_wasm = { path = "./kimchi-wasm" }
-mina-base58 = { path = "./crates/mina-base58" }
-mina-curves = { path = "./curves", default-features = false, features = [
-  "asm",
-] }
-mina-hasher = { path = "./hasher" }
-mina-poseidon = { path = "./poseidon", default-features = false }
-mina-signer = { path = "./signer" }
-mina-tx-type = { path = "./mina-tx-type" }
-mvpoly = { path = "./mvpoly" }
-o1-utils = { path = "./utils", default-features = false }
-o1vm = { path = "./o1vm" }
-optimism = { path = "./optimism" }
-poly-commitment = { path = "./poly-commitment", default-features = false }
-signer = { path = "./signer" }
-utils = { path = "./utils" }
 wasm-types = { path = "./crates/wasm-types" }
+zeroize = "1"
 
 [patch.crates-io]
 bcs = { git = "https://github.com/o1-labs/bcs", rev = "d9c996b0" }

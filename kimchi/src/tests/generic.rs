@@ -15,17 +15,6 @@ use mina_poseidon::{
     pasta::FULL_ROUNDS,
     sponge::{DefaultFqSponge, DefaultFrSponge},
 };
-#[cfg(feature = "bn254")]
-mod kzg {
-    pub(super) use ark_bn254::{g1::Config as Bn254G1Config, Fr};
-    pub(super) use ark_ec::bn::Bn;
-    pub(super) use poly_commitment::{
-        kzg::{KZGProof, PairingSRS},
-        SRS,
-    };
-}
-#[cfg(feature = "bn254")]
-use kzg::*;
 
 #[cfg(not(feature = "prover"))]
 use mina_curves::pasta::{Fq, Pallas, PallasParameters};
