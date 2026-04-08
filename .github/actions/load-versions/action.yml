@@ -37,11 +37,13 @@ runs:
   steps:
     - name: Ensure yq is available
       shell: bash
+      env:
+        YQ_VERSION: v4.52.5
       run: |
         if ! command -v yq >/dev/null 2>&1; then
-          echo "yq not found, installing to /usr/local/bin/yq"
+          echo "yq not found, installing ${YQ_VERSION} to /usr/local/bin/yq"
           sudo wget -qO /usr/local/bin/yq \
-            https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+            "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_linux_amd64"
           sudo chmod +x /usr/local/bin/yq
         fi
         yq --version
