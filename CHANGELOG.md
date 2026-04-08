@@ -9,6 +9,11 @@ and this project adheres to
 
 ## Unreleased
 
+### Added
+
+- Add `kimchi-napi` crate for native Node-API access to Kimchi from Node.js
+  ([#3546](https://github.com/o1-labs/proof-systems/pull/3546))
+
 ## 0.6.0
 
 ### [kimchi](./kimchi)
