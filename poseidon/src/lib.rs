@@ -27,7 +27,9 @@
 #![deny(clippy::all)]
 #![deny(clippy::pedantic)]
 #![deny(clippy::nursery)]
-#![no_std]
+#![cfg_attr(not(feature = "std"), no_std)]
+
+extern crate alloc;
 
 extern crate alloc;
 

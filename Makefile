@@ -64,30 +64,6 @@ O1VM_FEATURES = \
 	$(WORKSPACE_FEATURES),\
 	o1vm/open_mips
 
-# Feature flags for building with all features except no-std.
-# The no-std feature conflicts with std-dependent code.
-# See https://github.com/o1-labs/mina-rust/issues/1984
-WORKSPACE_FEATURES = \
-	arkworks/std,\
-	arkworks/wasm,\
-	internal-tracing/enabled,\
-	internal-tracing/ocaml_types,\
-	kimchi/bn254,\
-	kimchi/check_feature_flags,\
-	kimchi/diagnostics,\
-	kimchi/internal_tracing,\
-	kimchi/ocaml_types,\
-	kimchi/wasm_types,\
-	mina-curves/asm,\
-	mina-poseidon/ocaml_types,\
-	o1-utils/diagnostics,\
-	poly-commitment/ocaml_types
-
-# Additional feature flags for o1vm builds
-O1VM_FEATURES = \
-	$(WORKSPACE_FEATURES),\
-	o1vm/open_mips
-
 # Default target
 .PHONY: all
 all: release
@@ -134,6 +110,7 @@ install-test-deps: ## Install test dependencies
 		@echo ""
 		rustup component add llvm-tools-preview
 		cargo install cargo-nextest@=0.9.67 --locked
+		cargo install cargo-no-std --git https://github.com/o1-labs/cargo-no-std --rev 16901db8 --locked
 		cargo install grcov@=0.8.13 --locked
 		@echo ""
 		@echo "Test dependencies installed."
@@ -180,6 +157,40 @@ release-all: ## Build in release mode including o1vm
 			--exclude kimchi_wasm \
 			--release \
 			--workspace
+
+.PHONY: check-kimchi-test-parity
+check-kimchi-test-parity: ## Check that kimchi prover and verifier-only modes have the same test list
+		@echo "Listing prover-mode tests..."
+		@cargo test -p kimchi --lib -- tests:: --list 2>/dev/null \
+			| grep '::' | sed 's/: test$$//' | grep '^tests::' | sort > /tmp/kimchi_prover_tests.txt
+		@echo "Listing verifier-only-mode tests..."
+		@cargo test -p kimchi --no-default-features --features internal_tracing --lib -- tests:: --list 2>/dev/null \
+			| grep '::' | sed 's/: test$$//' | grep '^tests::' | sort > /tmp/kimchi_no_prover_tests.txt
+		@echo "Comparing (excluding prover-only modules: chunked, lazy_mode, serde)..."
+		@grep -v 'tests::chunked::' /tmp/kimchi_prover_tests.txt \
+			| grep -v 'tests::lazy_mode::' \
+			| grep -v 'tests::serde::' > /tmp/kimchi_prover_tests_filtered.txt
+		@diff /tmp/kimchi_prover_tests_filtered.txt /tmp/kimchi_no_prover_tests.txt \
+			&& echo "Test parity OK" \
+			|| (echo "ERROR: test list mismatch between prover and verifier-only modes" && exit 1)
+
+.PHONY: test-kimchi-verifier-only
+test-kimchi-verifier-only: check-kimchi-test-parity ## Test kimchi verifier without the prover feature (no-std verification path)
+		cargo nextest run \
+			-p kimchi \
+			--no-default-features \
+			--features internal_tracing \
+			--release \
+			--lib
+
+.PHONY: no-std-check-kimchi
+no-std-check-kimchi: ## Check kimchi compiles in no-std mode
+		cargo no-std \
+			-p kimchi \
+			--no-default-features \
+			--target x86_64-unknown-none \
+			--alloc \
+			--features sha2-force-soft
 
 .PHONY: test-doc
 test-doc: ## Test the project's docs comments (without o1vm)

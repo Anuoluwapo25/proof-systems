@@ -1,6 +1,6 @@
 [package]
 name = "kimchi-napi"
-version = "0.1.0"
+version.workspace = true
 authors = ["opensource@o1labs.org"]
 description = "Node-API bindings for kimchi proof systems"
 repository = "https://github.com/MinaProtocol/mina"

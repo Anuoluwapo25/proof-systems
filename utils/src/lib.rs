@@ -54,6 +54,7 @@ macro_rules! cfg_into_iter {
 pub mod adjacent_pairs;
 pub mod biguint_helpers;
 pub mod bitwise_operations;
+#[cfg(feature = "std")]
 pub mod chunked_evaluations;
 pub mod chunked_polynomial;
 pub mod dense_polynomial;
@@ -62,11 +63,13 @@ pub mod field_helpers;
 pub mod foreign_field;
 pub mod hasher;
 pub mod lazy_cache;
+pub mod lazy_lock;
 pub mod math;
 pub mod serialization;
 
 pub use biguint_helpers::BigUintHelpers;
 pub use bitwise_operations::BitwiseOps;
+#[cfg(feature = "std")]
 pub use chunked_evaluations::ChunkedEvaluations;
 pub use dense_polynomial::ExtendedDensePolynomial;
 pub use evaluations::ExtendedEvaluations;

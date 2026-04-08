@@ -36,6 +36,8 @@ use rand::thread_rng;
 use rand_core::{CryptoRng, RngCore};
 use serde::{Deserialize, Serialize};
 use serde_with::serde_as;
+#[cfg(feature = "std")]
+use std::ops::Deref;
 
 /// Combine the (chunked) evaluations of multiple polynomials.
 ///
@@ -127,7 +129,6 @@ impl<Pair: Pairing> Clone for KZGProof<Pair> {
 ///
 /// The SRS is formed using what we call a "trusted setup". For now, the setup
 /// is created using the method `create_trusted_setup_with_toxic_waste`.
-#[allow(clippy::unsafe_derive_deserialize)]
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub struct PairingSRS<Pair: Pairing> {
     /// The full SRS is the one used by the prover. Can be seen as the "proving
@@ -256,11 +257,17 @@ impl<
         self.full_srs.max_poly_size()
     }
 
-    fn get_lagrange_basis(&self, domain: D<G::ScalarField>) -> &Vec<PolyComm<G>> {
+    fn get_lagrange_basis(
+        &self,
+        domain: D<G::ScalarField>,
+    ) -> impl Deref<Target = Vec<PolyComm<G>>> + '_ {
         self.full_srs.get_lagrange_basis(domain)
     }
 
-    fn get_lagrange_basis_from_domain_size(&self, domain_size: usize) -> &Vec<PolyComm<G>> {
+    fn get_lagrange_basis_from_domain_size(
+        &self,
+        domain_size: usize,
+    ) -> impl Deref<Target = Vec<PolyComm<G>>> + '_ {
         self.full_srs
             .get_lagrange_basis_from_domain_size(domain_size)
     }
