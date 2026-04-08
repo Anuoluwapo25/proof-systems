@@ -298,7 +298,7 @@ dependencies = [
 
 [[package]]
 name = "arkworks"
-version = "0.4.1"
+version = "0.6.0"
 dependencies = [
  "ark-ec",
  "ark-ff",
@@ -313,7 +313,7 @@ dependencies = [
 
 [[package]]
 name = "arrabbiata"
-version = "0.4.1"
+version = "0.6.0"
 dependencies = [
  "ark-ec",
  "ark-ff",
@@ -330,7 +330,6 @@ dependencies = [
  "num-bigint",
  "num-integer",
  "o1-utils",
- "once_cell",
  "poly-commitment",
  "rand 0.8.5",
  "rayon",
@@ -398,11 +397,10 @@ checksum = "89e25b6adfb930f02d1981565a6e5d9c547ac15a96606256d3b59040e5cd4ca3"
 [[package]]
 name = "bcs"
 version = "0.1.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "85b6598a2f5d564fb7855dc6b06fd1c38cff5a72bd8b863a4d021938497b440a"
+source = "git+https://github.com/o1-labs/bcs?rev=d9c996b0#d9c996b04d84a6e4333a1b75201ecf91257c67fa"
 dependencies = [
  "serde",
- "thiserror 1.0.56",
+ "thiserror 2.0.18",
 ]
 
 [[package]]
@@ -724,6 +722,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "const-oid"
+version = "0.9.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c2459377285ad874054d797f3ccebf984978aa39129f6eafde5cdc8315b612f8"
+
+[[package]]
 name = "const-random"
 version = "0.1.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -878,22 +882,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "ctor"
-version = "0.6.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "59c9b8bdf64ee849747c1b12eb861d21aa47fa161564f48332f1afe2373bf899"
-dependencies = [
- "ctor-proc-macro",
- "dtor",
-]
-
-[[package]]
-name = "ctor-proc-macro"
-version = "0.0.7"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "52560adf09603e58c9a7ee1fe1dcb95a16927b17c127f0ac02d6e768a0e25bc1"
-
-[[package]]
 name = "cty"
 version = "0.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -969,6 +957,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9ed9a281f7bc9b7576e61468ba615a66a5c8cfdff42420a70aa82701a3b1e292"
 dependencies = [
  "block-buffer",
+ "const-oid",
  "crypto-common",
  "subtle",
 ]
@@ -1120,7 +1109,7 @@ dependencies = [
 
 [[package]]
 name = "export_test_vectors"
-version = "0.4.1"
+version = "0.6.0"
 dependencies = [
  "ark-ff",
  "ark-serialize",
@@ -1169,6 +1158,12 @@ name = "fnv"
 version = "1.0.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3f9eec918d3f24069decb9af1554cad7c880e2da24a9afd88aca000531ab82c1"
+
+[[package]]
+name = "foldhash"
+version = "0.1.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d9c4f5dac5e15c24eb999c26181a6ca40b39fe946cbe4c263c7209467bc83af2"
 
 [[package]]
 name = "form_urlencoded"
@@ -1244,7 +1239,7 @@ checksum = "a8d1add55171497b4705a648c6b583acafb01d58050a51727785f0b2c8e0a2b2"
 
 [[package]]
 name = "groupmap"
-version = "0.4.1"
+version = "0.6.0"
 dependencies = [
  "ark-ec",
  "ark-ff",
@@ -1284,6 +1279,9 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "84b26c544d002229e640969970a2e74021aadf6e2f96372b9c58eff97de08eb3"
 dependencies = [
  "allocator-api2",
+ "equivalent",
+ "foldhash",
+ "serde",
 ]
 
 [[package]]
@@ -1566,7 +1564,7 @@ dependencies = [
 
 [[package]]
 name = "internal-tracing"
-version = "0.4.1"
+version = "0.6.0"
 dependencies = [
  "ocaml",
  "ocaml-gen",
@@ -1662,9 +1660,9 @@ dependencies = [
 
 [[package]]
 name = "js-sys"
-version = "0.3.77"
+version = "0.3.83"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1cfaf33c695fc6e08064efbc1f72ec937429614f25eef83af942d0e227c3a28f"
+checksum = "464a3709c7f55f1f721e5389aa6ea4e3bc6aba669353300af094b29ffbdde1d8"
 dependencies = [
  "once_cell",
  "wasm-bindgen",
@@ -1681,7 +1679,7 @@ dependencies = [
 
 [[package]]
 name = "kimchi"
-version = "0.4.1"
+version = "0.6.0"
 dependencies = [
  "ark-bn254",
  "ark-ec",
@@ -1703,7 +1701,6 @@ dependencies = [
  "o1-utils",
  "ocaml",
  "ocaml-gen",
- "once_cell",
  "poly-commitment",
  "proptest",
  "proptest-derive",
@@ -1715,6 +1712,7 @@ dependencies = [
  "serde",
  "serde_json",
  "serde_with",
+ "sha2",
  "strum",
  "strum_macros",
  "thiserror 2.0.18",
@@ -1725,7 +1723,7 @@ dependencies = [
 
 [[package]]
 name = "kimchi-msm"
-version = "0.4.1"
+version = "0.6.0"
 dependencies = [
  "ark-bn254",
  "ark-ec",
@@ -1757,7 +1755,7 @@ dependencies = [
 
 [[package]]
 name = "kimchi-napi"
-version = "0.1.0"
+version = "0.6.0"
 dependencies = [
  "ark-ec",
  "ark-ff",
@@ -1790,7 +1788,7 @@ dependencies = [
 
 [[package]]
 name = "kimchi-stubs"
-version = "0.4.1"
+version = "0.6.0"
 dependencies = [
  "ark-ec",
  "ark-ff",
@@ -1805,7 +1803,6 @@ dependencies = [
  "o1-utils",
  "ocaml",
  "ocaml-gen",
- "once_cell",
  "paste",
  "poly-commitment",
  "rand 0.8.5",
@@ -1817,7 +1814,7 @@ dependencies = [
 
 [[package]]
 name = "kimchi-visu"
-version = "0.4.1"
+version = "0.6.0"
 dependencies = [
  "ark-ec",
  "ark-ff",
@@ -1905,16 +1902,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "libloading"
-version = "0.8.9"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d7c4b02199fee7c5d21a5ae7d8cfa79a6ef5bb2fc834d6e9058e89c825efdc55"
-dependencies = [
- "cfg-if",
- "windows-link",
-]
-
-[[package]]
 name = "libm"
 version = "0.2.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1972,7 +1959,7 @@ checksum = "523dc4f511e55ab87b694dc30d0f820d60906ef06413f93d4d7a1385599cc149"
 
 [[package]]
 name = "mina-base58"
-version = "0.4.1"
+version = "0.6.0"
 dependencies = [
  "bs58",
  "hex",
@@ -1983,7 +1970,7 @@ dependencies = [
 
 [[package]]
 name = "mina-curves"
-version = "0.4.1"
+version = "0.6.0"
 dependencies = [
  "ark-algebra-test-templates",
  "ark-bn254",
@@ -1998,7 +1985,7 @@ dependencies = [
 
 [[package]]
 name = "mina-hasher"
-version = "0.4.1"
+version = "0.6.0"
 dependencies = [
  "ark-ff",
  "bitvec",
@@ -2011,7 +1998,7 @@ dependencies = [
 
 [[package]]
 name = "mina-poseidon"
-version = "0.4.1"
+version = "0.6.0"
 dependencies = [
  "ark-ec",
  "ark-ff",
@@ -2023,7 +2010,6 @@ dependencies = [
  "o1-utils",
  "ocaml",
  "ocaml-gen",
- "once_cell",
  "rand 0.8.5",
  "rayon",
  "serde",
@@ -2033,7 +2019,7 @@ dependencies = [
 
 [[package]]
 name = "mina-signer"
-version = "0.4.1"
+version = "0.6.0"
 dependencies = [
  "ark-ec",
  "ark-ff",
@@ -2053,7 +2039,7 @@ dependencies = [
 
 [[package]]
 name = "mina-tx-type"
-version = "0.4.1"
+version = "0.6.0"
 dependencies = [
  "mina-signer",
 ]
@@ -2069,7 +2055,7 @@ dependencies = [
 
 [[package]]
 name = "mvpoly"
-version = "0.4.1"
+version = "0.6.0"
 dependencies = [
  "ark-ff",
  "criterion",
@@ -2194,7 +2180,7 @@ dependencies = [
 
 [[package]]
 name = "o1-utils"
-version = "0.4.1"
+version = "0.6.0"
 dependencies = [
  "ark-ec",
  "ark-ff",
@@ -2206,7 +2192,6 @@ dependencies = [
  "num-bigint",
  "num-integer",
  "rand 0.8.5",
- "rand_core 0.6.4",
  "rayon",
  "rmp-serde",
  "rustversion",
@@ -2215,6 +2200,7 @@ dependencies = [
  "serde_json",
  "serde_with",
  "sha2",
+ "spin",
  "thiserror 2.0.18",
  "tikv-jemalloc-ctl",
  "tikv-jemallocator",
@@ -2222,7 +2208,7 @@ dependencies = [
 
 [[package]]
 name = "o1vm"
-version = "0.4.1"
+version = "0.6.0"
 dependencies = [
  "ark-bn254",
  "ark-ec",
@@ -2473,7 +2459,7 @@ dependencies = [
 
 [[package]]
 name = "poly-commitment"
-version = "0.4.1"
+version = "0.6.0"
 dependencies = [
  "ark-bn254",
  "ark-ec",
@@ -2483,6 +2469,7 @@ dependencies = [
  "blake2",
  "criterion",
  "groupmap",
+ "hashbrown 0.15.3",
  "hex",
  "itertools 0.12.1",
  "mina-curves",
@@ -3056,6 +3043,16 @@ dependencies = [
  "cfg-if",
  "cpufeatures",
  "digest",
+ "sha2-asm",
+]
+
+[[package]]
+name = "sha2-asm"
+version = "0.6.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b845214d6175804686b2bd482bcffe96651bb2d1200742b712003504a2dac1ab"
+dependencies = [
+ "cc",
 ]
 
 [[package]]
@@ -3091,6 +3088,12 @@ name = "smallvec"
 version = "1.13.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3c5e1a9a646d36c3599cd173a41282daf47c44583ad367b8e6837255952e5c67"
+
+[[package]]
+name = "spin"
+version = "0.10.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d5fe4ccb98d9c292d56fec89a5e07da7fc4cf0dc11e156b41793132775d3e591"
 
 [[package]]
 name = "spmc"
@@ -3581,27 +3584,14 @@ dependencies = [
 
 [[package]]
 name = "wasm-bindgen"
-version = "0.2.100"
+version = "0.2.106"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1edc8929d7499fc4e8f0be2262a241556cfc54a0bea223790e71446f2aab1ef5"
+checksum = "0d759f433fa64a2d763d1340820e46e111a7a5ab75f993d1852d70b03dbb80fd"
 dependencies = [
  "cfg-if",
  "once_cell",
  "rustversion",
  "wasm-bindgen-macro",
-]
-
-[[package]]
-name = "wasm-bindgen-backend"
-version = "0.2.100"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2f0a0651a5c2bc21487bde11ee802ccaf4c51935d0d3d42a6101f98161700bc6"
-dependencies = [
- "bumpalo",
- "log",
- "proc-macro2",
- "quote",
- "syn 2.0.100",
  "wasm-bindgen-shared",
 ]
 
@@ -3619,9 +3609,9 @@ dependencies = [
 
 [[package]]
 name = "wasm-bindgen-macro"
-version = "0.2.100"
+version = "0.2.106"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7fe63fc6d09ed3792bd0897b314f53de8e16568c2b3f7982f468c0bf9bd0b407"
+checksum = "48cb0d2638f8baedbc542ed444afc0644a29166f1595371af4fecf8ce1e7eeb3"
 dependencies = [
  "quote",
  "wasm-bindgen-macro-support",
@@ -3629,22 +3619,22 @@ dependencies = [
 
 [[package]]
 name = "wasm-bindgen-macro-support"
-version = "0.2.100"
+version = "0.2.106"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8ae87ea40c9f689fc23f209965b6fb8a99ad69aeeb0231408be24920604395de"
+checksum = "cefb59d5cd5f92d9dcf80e4683949f15ca4b511f4ac0a6e14d4e1ac60c6ecd40"
 dependencies = [
+ "bumpalo",
  "proc-macro2",
  "quote",
  "syn 2.0.100",
- "wasm-bindgen-backend",
  "wasm-bindgen-shared",
 ]
 
 [[package]]
 name = "wasm-bindgen-shared"
-version = "0.2.100"
+version = "0.2.106"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1a05d73b933a847d6cccdda8f838a22ff101ad9bf93e33684f39c1f5f0eece3d"
+checksum = "cbc538057e648b67f72a982e708d485b2efa771e1ac05fec311f9f63e5800db4"
 dependencies = [
  "unicode-ident",
 ]
@@ -3707,7 +3697,7 @@ dependencies = [
 
 [[package]]
 name = "wasm-types"
-version = "0.4.1"
+version = "0.6.0"
 dependencies = [
  "wasm-bindgen",
 ]
@@ -3932,7 +3922,7 @@ dependencies = [
 
 [[package]]
 name = "xtask"
-version = "0.4.1"
+version = "0.6.0"
 dependencies = [
  "anyhow",
  "clap",

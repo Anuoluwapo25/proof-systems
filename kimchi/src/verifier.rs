@@ -1,4 +1,7 @@
 //! This module implements zk-proof batch verifier functionality.
+use alloc::{vec, vec::Vec};
+
+use core::fmt::Debug;
 
 use std::fmt::Debug;
 
@@ -32,7 +35,7 @@ use poly_commitment::{
     },
     OpenProof, SRS,
 };
-use rand::thread_rng;
+use rand_core::{CryptoRng, RngCore};
 
 /// The result of a proof verification.
 pub type Result<T> = core::result::Result<T, VerifyError>;
@@ -95,7 +98,6 @@ impl<
                     EndoMul => Some(&self.verifier_index.emul_comm),
                     EndoMulScalar => Some(&self.verifier_index.endomul_scalar_comm),
                     Poseidon => Some(&self.verifier_index.psm_comm),
-                    CairoClaim | CairoInstruction | CairoFlags | CairoTransition => None,
                     RangeCheck0 => Some(self.verifier_index.range_check0_comm.as_ref()?),
                     RangeCheck1 => Some(self.verifier_index.range_check1_comm.as_ref()?),
                     ForeignFieldAdd => Some(self.verifier_index.foreign_field_add_comm.as_ref()?),
@@ -1198,6 +1200,7 @@ where
 /// # Errors
 ///
 /// Will give error if `proof(s)` are not verified as valid.
+#[cfg(feature = "std")]
 pub fn verify<
     const FULL_ROUNDS: usize,
     G,
@@ -1225,6 +1228,44 @@ where
     batch_verify::<FULL_ROUNDS, G, EFqSponge, EFrSponge, OpeningProof>(group_map, &proofs)
 }
 
+/// Verify a proof [`ProverProof`] using a [`VerifierIndex`], a `group_map`, and an RNG.
+///
+/// This is the no_std-compatible version of [`verify`].
+///
+/// # Errors
+///
+/// Will give error if `proof(s)` are not verified as valid.
+pub fn verify_with_rng<
+    const FULL_ROUNDS: usize,
+    G,
+    EFqSponge,
+    EFrSponge,
+    OpeningProof: OpenProof<G, FULL_ROUNDS>,
+    RNG: RngCore + CryptoRng,
+>(
+    group_map: &G::Map,
+    verifier_index: &VerifierIndex<FULL_ROUNDS, G, OpeningProof::SRS>,
+    proof: &ProverProof<G, OpeningProof, FULL_ROUNDS>,
+    public_input: &[G::ScalarField],
+    rng: &mut RNG,
+) -> Result<()>
+where
+    G: KimchiCurve<FULL_ROUNDS>,
+    G::BaseField: PrimeField,
+    EFqSponge: Clone + FqSponge<G::BaseField, G, G::ScalarField, FULL_ROUNDS>,
+    EFrSponge: FrSponge<G::ScalarField>,
+    EFrSponge: From<&'static ArithmeticSpongeParams<G::ScalarField, FULL_ROUNDS>>,
+{
+    let proofs = [Context {
+        verifier_index,
+        proof,
+        public_input,
+    }];
+    batch_verify_with_rng::<FULL_ROUNDS, G, EFqSponge, EFrSponge, OpeningProof, RNG>(
+        group_map, &proofs, rng,
+    )
+}
+
 /// This function verifies the batch of zk-proofs
 ///     proofs: vector of Plonk proofs
 ///     RETURN: verification status
@@ -1232,6 +1273,7 @@ where
 /// # Errors
 ///
 /// Will give error if `srs` of `proof` is invalid or `verify` process fails.
+#[cfg(feature = "std")]
 pub fn batch_verify<
     const FULL_ROUNDS: usize,
     G,
@@ -1241,6 +1283,42 @@ pub fn batch_verify<
 >(
     group_map: &G::Map,
     proofs: &[Context<FULL_ROUNDS, G, OpeningProof, OpeningProof::SRS>],
+) -> Result<()>
+where
+    G: KimchiCurve<FULL_ROUNDS>,
+    G::BaseField: PrimeField,
+    EFqSponge: Clone + FqSponge<G::BaseField, G, G::ScalarField, FULL_ROUNDS>,
+    EFrSponge: FrSponge<G::ScalarField>,
+    EFrSponge: From<&'static ArithmeticSpongeParams<G::ScalarField, FULL_ROUNDS>>,
+{
+    batch_verify_with_rng::<FULL_ROUNDS, G, EFqSponge, EFrSponge, OpeningProof, _>(
+        group_map,
+        proofs,
+        &mut rand::thread_rng(),
+    )
+}
+
+/// This function verifies the batch of zk-proofs with an explicit RNG.
+///     proofs: vector of Plonk proofs
+///     rng: random number generator
+///     RETURN: verification status
+///
+/// This is the no_std-compatible version of [`batch_verify`].
+///
+/// # Errors
+///
+/// Will give error if `srs` of `proof` is invalid or `verify` process fails.
+pub fn batch_verify_with_rng<
+    const FULL_ROUNDS: usize,
+    G,
+    EFqSponge,
+    EFrSponge,
+    OpeningProof: OpenProof<G, FULL_ROUNDS>,
+    RNG: RngCore + CryptoRng,
+>(
+    group_map: &G::Map,
+    proofs: &[Context<FULL_ROUNDS, G, OpeningProof, OpeningProof::SRS>],
+    rng: &mut RNG,
 ) -> Result<()>
 where
     G: KimchiCurve<FULL_ROUNDS>,
@@ -1289,7 +1367,7 @@ where
     }
 
     //~ 1. Use the [`PolyCom.verify`](#polynomial-commitments) to verify the partially evaluated proofs.
-    if OpeningProof::verify(srs, group_map, &mut batch, &mut thread_rng()) {
+    if OpeningProof::verify(srs, group_map, &mut batch, rng) {
         Ok(())
     } else {
         Err(VerifyError::OpenProof)

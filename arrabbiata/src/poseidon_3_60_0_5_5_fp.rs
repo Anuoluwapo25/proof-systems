@@ -1,6 +1,8 @@
 use mina_curves::pasta::Fp;
 use mina_poseidon::poseidon::ArithmeticSpongeParams;
-use once_cell::sync::Lazy;
+use std::sync::LazyLock;
+
+type Params = ArithmeticSpongeParams<Fp, 60>;
 
 type Params = ArithmeticSpongeParams<Fp, 60>;
 
@@ -900,6 +902,6 @@ fn params() -> Params {
 }
 
 pub fn static_params() -> &'static Params {
-    static PARAMS: Lazy<Params> = Lazy::new(params);
+    static PARAMS: LazyLock<Params> = LazyLock::new(params);
     &PARAMS
 }
