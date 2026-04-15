@@ -9,6 +9,8 @@ and this project adheres to
 
 ## Unreleased
 
+## 0.7.0
+
 ### Added
 
 - Add `kimchi-napi` crate for native Node-API access to Kimchi from Node.js
